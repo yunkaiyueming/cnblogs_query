@@ -4,16 +4,4 @@ accesskey: kymzmlom44
 cron:
     - description: cron get cnblogs
       url: http://ykcnblogs.sinaapp.com/record_cn_blogs.php
-      schedule: */30 * * * * 
-      
-      
-      name: APPNAME
-version: 1
-accesskey: abc
-cron:
-    - description: cron test
-      url: mycron/test.php
-      schedule: 00 19 2 10 *
-    - description: another cron test
-      url: mycron/another_test.php
-      schedule: */10 * * * * 
+      schedule: */30 * * * *
