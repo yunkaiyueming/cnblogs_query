@@ -18,7 +18,7 @@ $reg = array(
 $rang = '.post_item';
 
 //3页=60篇博文
-$con = mysql_connect(DB_HOST, DB_USER, DB_PWD);
+$con = mysql_connect(DB_HOST.":".DB_PORT, DB_USER, DB_PWD);
 mysql_select_db(DB_NAME);
 for($i=1; $i<4; $i++){
 	$url = 'http://www.cnblogs.com';

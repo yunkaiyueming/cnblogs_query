@@ -16,7 +16,7 @@ $page = empty($page) ? 1 : $page;
 $limit_num = 50;
 $start_num = ($page - 1) * $limit_num;
 
-$con = mysql_connect(DB_HOST, DB_USER, DB_PWD);
+$con = mysql_connect(DB_HOST.":".DB_PORT, DB_USER, DB_PWD);
 mysql_select_db(DB_NAME);
 
 $res = mysql_query("select count(*) from cn_blogs");
