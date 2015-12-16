@@ -1,0 +1,7 @@
+name: ykcnblogs
+version: 1
+accesskey: kymzmlom44
+cron:
+    - description: cron test
+      url: http://ykcnblogs.sinaapp.com/record_cn_blogs.php
+      schedule: */30 * * * * 
