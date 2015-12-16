@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ERROR);
+//error_reporting(E_ERROR);
 
 //引用相关的类库
 require 'QueryList/QueryList.class.php';
@@ -20,14 +20,18 @@ $rang = '.post_item';
 //3页=60篇博文
 $con = mysql_connect(DB_HOST.":".DB_PORT, DB_USER, DB_PWD);
 mysql_select_db(DB_NAME);
-for($i=1; $i<4; $i++){
+for($page=4; $page>0; $page--){
+	echo $page."<br>";
 	$url = 'http://www.cnblogs.com';
-	$url = empty($i) ? $url : ($url."/p".$i);
+	$url = empty($page) ? $url : ($url."/p".$page);echo $url;
 	$hj = QueryList::Query($url, $reg, $rang, 'UTF-8');
-	$cn_blogs = $hj->data;
+	$cn_blogs = $hj->data;//print_r($cn_blogs);
 
 	$cloum_name = array('img_url','title', 'content', 'content_url');
-	foreach($cn_blogs as $cn_blog){
+	$get_cnblogs_nums = count($cn_blogs)-1;
+	
+	for($i=$get_cnblogs_nums; $i>=0; $i--){
+		$cn_blog = $cn_blogs[$i];
 		
 		$exist_sql = "select id from cn_blogs where content_url='".$cn_blog['content_url']."'";
 		$exist_res = mysql_query($exist_sql);

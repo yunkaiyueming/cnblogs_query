@@ -8,6 +8,7 @@
 		</style>
 	</head>
 	<body>
+		<input type="button" value="手动更新" id="update_btn">
 		<?php
 		error_reporting(E_ERROR);
 		include 'config.php';
@@ -47,4 +48,18 @@
 		echo "<a href='?page=$page_num'>末页</a>  ";
 		?>
 	</body>
+
+	<script src="http://lib.sinaapp.com/js/jquery/2.0.3/jquery-2.0.3.min.js"></script>
+	<script type="text/javascript">
+        $(function(){
+			$('#update_btn').click(function(){
+				//alert(1);
+				$.get("./record_cn_blogs.php", {}, function (data) {
+					if(data){
+						window.location.reload();
+					}
+				});
+			});
+		});
+	</script>
 </html>
