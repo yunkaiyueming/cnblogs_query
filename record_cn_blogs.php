@@ -21,11 +21,10 @@ $rang = '.post_item';
 $con = mysql_connect(DB_HOST.":".DB_PORT, DB_USER, DB_PWD);
 mysql_select_db(DB_NAME);
 for($page=4; $page>0; $page--){
-	echo $page."<br>";
 	$url = 'http://www.cnblogs.com';
-	$url = empty($page) ? $url : ($url."/p".$page);echo $url;
+	$url = empty($page) ? $url : ($url."/p".$page);
 	$hj = QueryList::Query($url, $reg, $rang, 'UTF-8');
-	$cn_blogs = $hj->data;//print_r($cn_blogs);
+	$cn_blogs = $hj->data;
 
 	$cloum_name = array('img_url','title', 'content', 'content_url');
 	$get_cnblogs_nums = count($cn_blogs)-1;
