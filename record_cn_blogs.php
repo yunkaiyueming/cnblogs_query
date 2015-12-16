@@ -25,7 +25,7 @@ for($page=4; $page>0; $page--){
 	$url = 'http://www.cnblogs.com';
 	$url = empty($page) ? $url : ($url."/p".$page);
 	$hj = QueryList::Query($url, $reg, $rang, 'UTF-8');
-	$cn_blogs = $hj->data;
+	$cn_blogs = $hj->data;print_r($cn_blogs);exit;
 
 	$cloum_name = array('img_url','title', 'content', 'content_url');
 	$get_cnblogs_nums = count($cn_blogs)-1;
