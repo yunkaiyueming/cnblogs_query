@@ -31,7 +31,7 @@ for($page=4; $page>0; $page--){
 	$get_cnblogs_nums = count($cn_blogs)-1;
 	
 	for($i=$get_cnblogs_nums; $i>=0; $i--){
-		echo $i."<br>";
+		echo $i." ";
 		$cn_blog = $cn_blogs[$i];
 		
 		$exist_sql = "select id from cn_blogs where content_url='".$cn_blog['content_url']."'";
