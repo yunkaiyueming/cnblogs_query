@@ -1,434 +1,416 @@
 <?php
-
-class class_mysql {
-
-	private $db_host; //数据库主机
-	private $db_user; //数据库用户名
-	private $db_pwd; //数据库用户名密码
-	private $db_database; //数据库名
-	private $conn; //数据库连接标识;
-	private $result; //执行query命令的结果资源标识
-	private $sql; //sql执行语句
-	private $row; //返回的条目数
-	private $coding; //数据库编码，GBK,UTF8,gb2312
-	private $bulletin = true; //是否开启错误记录
-	private $show_error = false; //测试阶段，显示所有错误,具有安全隐患,默认关闭
-	private $is_error = false; //发现错误是否立即终止,默认true,建议不启用，因为当有问题时用户什么也看不到是很苦恼的
-
-	/* 构造函数 */
-
-	public function __construct($db_host, $db_user, $db_pwd, $db_database='', $conn='', $coding='') {
-		$this->db_host = $db_host;
-		$this->db_user = $db_user;
-		$this->db_pwd = $db_pwd;
-		$this->db_database = $db_database;
-		//$this->conn = $conn;
-		$this->coding = $coding;
-		$this->connect();
-	}
-
-	/* 数据库连接 */
-
-	public function connect() {
-		if ($this->conn == "pconn") {
-			//永久链接
-			$this->conn = mysql_pconnect($this->db_host, $this->db_user, $this->db_pwd);
-		} else {
-			//即使链接
-			$this->conn = mysql_connect($this->db_host, $this->db_user, $this->db_pwd);
-		}
-
-		if (!mysql_select_db($this->db_database, $this->conn)) {
-			if ($this->show_error) {
-				$this->show_error("数据库不可用：", $this->db_database);
-			}
-		}
-		mysql_query("SET NAMES $this->coding");
-	}
-
-	/* 数据库执行语句，可执行查询添加修改删除等任何sql语句 */
-
-	public function query($sql) {
-		if ($sql == "") {
-			$this->show_error("SQL语句错误：", "SQL查询语句为空");
-		}
-		$this->sql = $sql;
-
-		$result = mysql_query($this->sql, $this->conn);
-
-		if (!$result) {
-			//调试中使用，sql语句出错时会自动打印出来
-			if ($this->show_error) {
-				$this->show_error("错误SQL语句：", $this->sql);
-			}
-		} else {
-			$this->result = $result;
-		}
-		return $this->result;
-	}
-
-	/* 创建添加新的数据库 */
-
-	public function create_database($database_name) {
-		$database = $database_name;
-		$sqlDatabase = 'create database ' . $database;
-		$this->query($sqlDatabase);
-	}
-
-	/* 查询服务器所有数据库 */
-
-	//将系统数据库与用户数据库分开，更直观的显示？
-	public function show_databases() {
-		$this->query("show databases");
-		echo "现有数据库：" . $amount = $this->db_num_rows($rs);
-		echo "<br />";
-		$i = 1;
-		while ($row = $this->fetch_array($rs)) {
-			echo "$i $row[Database]";
-			echo "<br />";
-			$i++;
-		}
-	}
-
-	//以数组形式返回主机中所有数据库名
-	public function databases() {
-		$rsPtr = mysql_list_dbs($this->conn);
-		$i = 0;
-		$cnt = mysql_num_rows($rsPtr);
-		while ($i < $cnt) {
-			$rs[] = mysql_db_name($rsPtr, $i);
-			$i++;
-		}
-		return $rs;
-	}
-
-	/* 查询数据库下所有的表 */
-
-	public function show_tables($database_name) {
-		$this->query("show tables");
-		echo "现有数据库：" . $amount = $this->db_num_rows($rs);
-		echo "<br />";
-		$i = 1;
-		while ($row = $this->fetch_array($rs)) {
-			$columnName = "Tables_in_" . $database_name;
-			echo "$i $row[$columnName]";
-			echo "<br />";
-			$i++;
-		}
-	}
-
-	/*
-	  mysql_fetch_row()    array  $row[0],$row[1],$row[2]
-	  mysql_fetch_array()  array  $row[0] 或 $row[id]
-	  mysql_fetch_assoc()  array  用$row->content 字段大小写敏感
-	  mysql_fetch_object() object 用$row[id],$row[content] 字段大小写敏感
-	 */
-
-	/* 取得结果数据 */
-
-	public function mysql_result_li() {
-		return mysql_result($str);
-	}
-
-	/* 取得记录集,获取数组-索引和关联,使用$row['content'] */
-
-	public function fetch_array($resultt = "") {
-		if ($resultt <> "") {
-			return mysql_fetch_array($resultt);
-		} else {
-			return mysql_fetch_array($this->result);
-		}
-	}
-
-	//获取关联数组,使用$row['字段名']
-	public function fetch_assoc($resultt = "") {
-		if ($resultt <> "") {
-			return mysql_fetch_assoc($resultt);
-		} else {
-			return mysql_fetch_assoc($this->result);
-		}
-		//return mysql_fetch_assoc($this->result);
-	}
-
-	//获取数字索引数组,使用$row[0],$row[1],$row[2]
-	public function fetch_row() {
-		return mysql_fetch_row($this->result);
-	}
-
-	//获取对象数组,使用$row->content
-	public function fetch_Object() {
-		return mysql_fetch_object($this->result);
-	}
-
-	//简化查询select
-	public function findall($table) {
-		$this->query("SELECT * FROM $table");
-	}
-
-	//简化查询select
-	public function select($table, $columnName = "*", $condition = '', $debug = '') {
-		$condition = $condition ? ' Where ' . $condition : NULL;
-		if ($debug) {
-			echo "SELECT $columnName FROM $table $condition";
-		} else {
-			$this->query("SELECT $columnName FROM $table $condition");
-		}
-	}
-
-	//简化删除del
-	public function delete($table, $condition, $url = '') {
-		if ($this->query("DELETE FROM $table WHERE $condition")) {
-			if (!empty($url))
-				$this->Get_admin_msg($url, '删除成功！');
-		}
-	}
-
-	//简化插入insert
-	public function insert($table, $columnName, $value, $url = '') {
-		if ($this->query("INSERT INTO $table ($columnName) VALUES ($value)")) {
-			if (!empty($url))
-				$this->Get_admin_msg($url, '添加成功！');
-		}
-	}
-
-	//简化修改update
-	public function update($table, $mod_content, $condition, $url = '') {
-		//echo "UPDATE $table SET $mod_content WHERE $condition"; exit();
-		if ($this->query("UPDATE $table SET $mod_content WHERE $condition")) {
-			if (!empty($url))
-				$this->Get_admin_msg($url);
-		}
-	}
-
-	/* 取得上一步 INSERT 操作产生的 ID */
-
-	public function insert_id() {
-		return mysql_insert_id();
-	}
-
-	//指向确定的一条数据记录
-	public function db_data_seek($id) {
-		if ($id > 0) {
-			$id = $id - 1;
-		}
-		if (!@ mysql_data_seek($this->result, $id)) {
-			$this->show_error("SQL语句有误：", "指定的数据为空");
-		}
-		return $this->result;
-	}
-
-	// 根据select查询结果计算结果集条数
-	public function db_num_rows() {
-		if ($this->result == null) {
-			if ($this->show_error) {
-				$this->show_error("SQL语句错误", "暂时为空，没有任何内容！");
-			}
-		} else {
-			return mysql_num_rows($this->result);
-		}
-	}
-
-	// 根据insert,update,delete执行结果取得影响行数
-	public function db_affected_rows() {
-		return mysql_affected_rows();
-	}
-
-	//输出显示sql语句
-	public function show_error($message = "", $sql = "") {
-		if (!$sql) {
-			echo "<font color='red'>" . $message . "</font>";
-			echo "<br />";
-		} else {
-			echo "<fieldset>";
-			echo "<legend>错误信息提示:</legend><br />";
-			echo "<div style='font-size:14px; clear:both; font-family:Verdana, Arial, Helvetica, sans-serif;'>";
-			echo "<div style='height:20px; background:#000000; border:1px #000000 solid'>";
-			echo "<font color='white'>错误号：12142</font>";
-			echo "</div><br />";
-			echo "错误原因：" . mysql_error() . "<br /><br />";
-			echo "<div style='height:20px; background:#FF0000; border:1px #FF0000 solid'>";
-			echo "<font color='white'>" . $message . "</font>";
-			echo "</div>";
-			echo "<font color='red'><pre>" . $sql . "</pre></font>";
-			$ip = $this->getip();
-			if ($this->bulletin) {
-				$time = date("Y-m-d H:i:s");
-				$message = $message . "\r\n$this->sql" . "\r\n客户IP:$ip" . "\r\n时间 :$time" . "\r\n\r\n";
-
-				$server_date = date("Y-m-d");
-				$filename = $server_date . ".txt";
-				$file_path = "error/" . $filename;
-				$error_content = $message;
-				//$error_content="错误的数据库，不可以链接";
-				$file = "error"; //设置文件保存目录
-				//建立文件夹
-				if (!file_exists($file)) {
-					if (!mkdir($file, 0777)) {
-						//默认的 mode 是 0777，意味着最大可能的访问权
-						die("upload files directory does not exist and creation failed");
-					}
-				}
-
-				//建立txt日期文件
-				if (!file_exists($file_path)) {
-
-					//echo "建立日期文件";
-					fopen($file_path, "w+");
-
-					//首先要确定文件存在并且可写
-					if (is_writable($file_path)) {
-						//使用添加模式打开$filename，文件指针将会在文件的开头
-						if (!$handle = fopen($file_path, 'a')) {
-							echo "不能打开文件 $filename";
-							exit;
-						}
-
-						//将$somecontent写入到我们打开的文件中。
-						if (!fwrite($handle, $error_content)) {
-							echo "不能写入到文件 $filename";
-							exit;
-						}
-
-						//echo "文件 $filename 写入成功";
-
-						echo "——错误记录被保存!";
-
-						//关闭文件
-						fclose($handle);
-					} else {
-						echo "文件 $filename 不可写";
-					}
-				} else {
-					//首先要确定文件存在并且可写
-					if (is_writable($file_path)) {
-						//使用添加模式打开$filename，文件指针将会在文件的开头
-						if (!$handle = fopen($file_path, 'a')) {
-							echo "不能打开文件 $filename";
-							exit;
-						}
-
-						//将$somecontent写入到我们打开的文件中。
-						if (!fwrite($handle, $error_content)) {
-							echo "不能写入到文件 $filename";
-							exit;
-						}
-
-						//echo "文件 $filename 写入成功";
-						echo "——错误记录被保存!";
-
-						//关闭文件
-						fclose($handle);
-					} else {
-						echo "文件 $filename 不可写";
-					}
-				}
-			}
-			echo "<br />";
-			if ($this->is_error) {
-				exit;
-			}
-		}
-		echo "</div>";
-		echo "</fieldset>";
-
-		echo "<br />";
-	}
-
-	//释放结果集
-	public function free() {
-		@ mysql_free_result($this->result);
-	}
-
-	//数据库选择
-	public function select_db($db_database) {
-		return mysql_select_db($db_database);
-	}
-
-	//查询字段数量
-	public function num_fields($table_name) {
-		//return mysql_num_fields($this->result);
-		$this->query("select * from $table_name");
-		echo "<br />";
-		echo "字段数：" . $total = mysql_num_fields($this->result);
-		echo "<pre>";
-		for ($i = 0; $i < $total; $i++) {
-			print_r(mysql_fetch_field($this->result, $i));
-		}
-		echo "</pre>";
-		echo "<br />";
-	}
-
-	//取得 MySQL 服务器信息
-	public function mysql_server($num = '') {
-		switch ($num) {
-			case 1 :
-				return mysql_get_server_info(); //MySQL 服务器信息
-				break;
-
-			case 2 :
-				return mysql_get_host_info(); //取得 MySQL 主机信息
-				break;
-
-			case 3 :
-				return mysql_get_client_info(); //取得 MySQL 客户端信息
-				break;
-
-			case 4 :
-				return mysql_get_proto_info(); //取得 MySQL 协议信息
-				break;
-
-			default :
-				return mysql_get_client_info(); //默认取得mysql版本信息
-		}
-	}
-
-	//析构函数，自动关闭数据库,垃圾回收机制
-	public function __destruct() {
-		if (!empty($this->result)) {
-			$this->free();
-		}
-		mysql_close($this->conn);
-	}
-
-//function __destruct();
-
-	/* 获得客户端真实的IP地址 */
-
-	function getip() {
-		if (getenv("HTTP_CLIENT_IP") && strcasecmp(getenv("HTTP_CLIENT_IP"), "unknown")) {
-			$ip = getenv("HTTP_CLIENT_IP");
-		} else
-		if (getenv("HTTP_X_FORWARDED_FOR") && strcasecmp(getenv("HTTP_X_FORWARDED_FOR"), "unknown")) {
-			$ip = getenv("HTTP_X_FORWARDED_FOR");
-		} else
-		if (getenv("REMOTE_ADDR") && strcasecmp(getenv("REMOTE_ADDR"), "unknown")) {
-			$ip = getenv("REMOTE_ADDR");
-		} else
-		if (isset($_SERVER['REMOTE_ADDR']) && $_SERVER['REMOTE_ADDR'] && strcasecmp($_SERVER['REMOTE_ADDR'], "unknown")) {
-			$ip = $_SERVER['REMOTE_ADDR'];
-		} else {
-			$ip = "unknown";
-		}
-		return ($ip);
-	}
-
-	function inject_check($sql_str) { //防止注入
-		$check = eregi('select|insert|update|delete|\'|\/\*|\*|\.\.\/|\.\/|union|into|load_file|outfile', $sql_str);
-		if ($check) {
-			echo "输入非法注入内容！";
-			exit();
-		} else {
-			return $sql_str;
-		}
-	}
-
-	function checkurl() { //检查来路
-		if (preg_replace("/https?:\/\/([^\:\/]+).*/i", "\\1", $_SERVER['HTTP_REFERER']) !== preg_replace("/([^\:]+).*/", "\\1", $_SERVER['HTTP_HOST'])) {
-			header("Location: http://www.dareng.com");
-			exit();
-		}
-	}
-
+/**
+ * Desc: php操作mysql的封装类
+ * Date: 2015/04/15
+ * 连接模式：PDO
+ */
+ 
+class MMysql {
+     
+    protected static $_dbh = null; //静态属性,所有数据库实例共用,避免重复连接数据库
+    protected $_dbType = 'mysql';
+    protected $_pconnect = true; //是否使用长连接
+    protected $_host = 'localhost';
+    protected $_port = 3306;
+    protected $_user = 'root';
+    protected $_pass = 'root';
+    protected $_dbName = null; //数据库名
+    protected $_sql = false; //最后一条sql语句
+    protected $_where = '';
+    protected $_order = '';
+    protected $_limit = '';
+    protected $_field = '*';
+    protected $_clear = 0; //状态，0表示查询条件干净，1表示查询条件污染
+    protected $_trans = 0; //事务指令数 
+  
+    /**
+     * 初始化类
+     * @param array $conf 数据库配置
+     */
+    public function __construct(array $conf) {
+        class_exists('PDO') or die("PDO: class not exists.");
+        $this->_host = $conf['host'];
+        $this->_port = $conf['port'];
+        $this->_user = $conf['user'];
+        $this->_pass = $conf['passwd'];
+        $this->_dbName = $conf['dbname'];
+        //连接数据库
+        if ( is_null(self::$_dbh) ) {
+            $this->_connect();
+        }
+    }
+     
+    /**
+     * 连接数据库的方法
+     */
+    protected function _connect() {
+        $dsn = $this->_dbType.':host='.$this->_host.';port='.$this->_port.';dbname='.$this->_dbName;
+        $options = $this->_pconnect ? array(PDO::ATTR_PERSISTENT=>true) : array();
+        try { 
+            $dbh = new PDO($dsn, $this->_user, $this->_pass, $options);
+            $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);  //设置如果sql语句执行错误则抛出异常，事务会自动回滚
+            $dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); //禁用prepared statements的仿真效果(防SQL注入)
+        } catch (PDOException $e) { 
+            die('Connection failed: ' . $e->getMessage());
+        }
+        $dbh->exec('SET NAMES utf8');
+        self::$_dbh = $dbh;
+    }
+ 
+    /** 
+    * 字段和表名添加 `符号
+    * 保证指令中使用关键字不出错 针对mysql 
+    * @param string $value 
+    * @return string 
+    */
+    protected function _addChar($value) { 
+        if ('*'==$value || false!==strpos($value,'(') || false!==strpos($value,'.') || false!==strpos($value,'`')) { 
+            //如果包含* 或者 使用了sql方法 则不作处理 
+        } elseif (false === strpos($value,'`') ) { 
+            $value = '`'.trim($value).'`';
+        } 
+        return $value; 
+    }
+     
+    /** 
+    * 取得数据表的字段信息 
+    * @param string $tbName 表名
+    * @return array 
+    */
+    protected function _tbFields($tbName) {
+        $sql = 'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME="'.$tbName.'" AND TABLE_SCHEMA="'.$this->_dbName.'"';
+        $stmt = self::$_dbh->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $ret = array();
+        foreach ($result as $key=>$value) {
+            $ret[$value['COLUMN_NAME']] = 1;
+        }
+        return $ret;
+    }
+ 
+    /** 
+    * 过滤并格式化数据表字段
+    * @param string $tbName 数据表名 
+    * @param array $data POST提交数据 
+    * @return array $newdata 
+    */
+    protected function _dataFormat($tbName,$data) {
+        if (!is_array($data)) return array();
+        $table_column = $this->_tbFields($tbName);
+        $ret=array();
+        foreach ($data as $key=>$val) {
+            if (!is_scalar($val)) continue; //值不是标量则跳过
+            if (array_key_exists($key,$table_column)) {
+                $key = $this->_addChar($key);
+                if (is_int($val)) { 
+                    $val = intval($val); 
+                } elseif (is_float($val)) { 
+                    $val = floatval($val); 
+                } elseif (preg_match('/^\(\w*(\+|\-|\*|\/)?\w*\)$/i', $val)) {
+                    // 支持在字段的值里面直接使用其它字段 ,例如 (score+1) (name) 必须包含括号
+                    $val = $val;
+                } elseif (is_string($val)) { 
+                    $val = '"'.addslashes($val).'"';
+                }
+                $ret[$key] = $val;
+            }
+        }
+        return $ret;
+    }
+     
+    /**
+    * 执行查询 主要针对 SELECT, SHOW 等指令
+    * @param string $sql sql指令 
+    * @return mixed 
+    */
+    protected function _doQuery($sql='') {
+        $this->_sql = $sql;
+        $pdostmt = self::$_dbh->prepare($this->_sql); //prepare或者query 返回一个PDOStatement
+        $pdostmt->execute();
+        $result = $pdostmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+    }
+     
+    /** 
+    * 执行语句 针对 INSERT, UPDATE 以及DELETE,exec结果返回受影响的行数
+    * @param string $sql sql指令 
+    * @return integer 
+    */
+    protected function _doExec($sql='') {
+        $this->_sql = $sql;
+        return self::$_dbh->exec($this->_sql);
+    }
+ 
+    /** 
+    * 执行sql语句，自动判断进行查询或者执行操作 
+    * @param string $sql SQL指令 
+    * @return mixed 
+    */
+    public function doSql($sql='') {
+        $queryIps = 'INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|LOAD DATA|SELECT .* INTO|COPY|ALTER|GRANT|REVOKE|LOCK|UNLOCK'; 
+        if (preg_match('/^\s*"?(' . $queryIps . ')\s+/i', $sql)) { 
+            return $this->_doExec($sql);
+        }
+        else {
+            //查询操作
+            return $this->_doQuery($sql);
+        }
+    }
+ 
+    /** 
+    * 获取最近一次查询的sql语句 
+    * @return String 执行的SQL 
+    */
+    public function getLastSql() { 
+        return $this->_sql;
+    }
+ 
+    /**
+     * 插入方法
+     * @param string $tbName 操作的数据表名
+     * @param array $data 字段-值的一维数组
+     * @return int 受影响的行数
+     */
+    public function insert($tbName,array $data){
+        $data = $this->_dataFormat($tbName,$data);
+        if (!$data) return;
+        $sql = "insert into ".$tbName."(".implode(',',array_keys($data)).") values(".implode(',',array_values($data)).")";
+        return $this->_doExec($sql);
+    }
+ 
+    /**
+     * 删除方法
+     * @param string $tbName 操作的数据表名
+     * @return int 受影响的行数
+     */
+    public function delete($tbName) {
+        //安全考虑,阻止全表删除
+        if (!trim($this->_where)) return false;
+        $sql = "delete from ".$tbName." ".$this->_where;
+        $this->_clear = 1;
+        $this->_clear();
+        return $this->_doExec($sql);
+    }
+  
+    /**
+     * 更新函数
+     * @param string $tbName 操作的数据表名
+     * @param array $data 参数数组
+     * @return int 受影响的行数
+     */
+    public function update($tbName,array $data) {
+        //安全考虑,阻止全表更新
+        if (!trim($this->_where)) return false;
+        $data = $this->_dataFormat($tbName,$data);
+        if (!$data) return;
+        $valArr = '';
+        foreach($data as $k=>$v){
+            $valArr[] = $k.'='.$v;
+        }
+        $valStr = implode(',', $valArr);
+        $sql = "update ".trim($tbName)." set ".trim($valStr)." ".trim($this->_where);
+        return $this->_doExec($sql);
+    }
+  
+    /**
+     * 查询函数
+     * @param string $tbName 操作的数据表名
+     * @return array 结果集
+     */
+    public function select($tbName='') {
+        $sql = "select ".trim($this->_field)." from ".$tbName." ".trim($this->_where)." ".trim($this->_order)." ".trim($this->_limit);
+        $this->_clear = 1;
+        $this->_clear();
+        return $this->_doQuery(trim($sql));
+    }
+  
+    /**
+     * @param mixed $option 组合条件的二维数组，例：$option['field1'] = array(1,'=>','or')
+     * @return $this
+     */
+    public function where($option) {
+        if ($this->_clear>0) $this->_clear();
+        $this->_where = ' where ';
+        $logic = 'and';
+        if (is_string($option)) {
+            $this->_where .= $option;
+        }
+        elseif (is_array($option)) {
+            foreach($option as $k=>$v) {
+                if (is_array($v)) {
+                    $relative = isset($v[1]) ? $v[1] : '=';
+                    $logic    = isset($v[2]) ? $v[2] : 'and';
+                    $condition = ' ('.$this->_addChar($k).' '.$relative.' '.$v[0].') ';
+                }
+                else {
+                    $logic = 'and';
+                    $condition = ' ('.$this->_addChar($k).'='.$v.') ';
+                }
+                $this->_where .= isset($mark) ? $logic.$condition : $condition;
+                $mark = 1;
+            }
+        }
+        return $this;
+    }
+  
+    /**
+     * 设置排序
+     * @param mixed $option 排序条件数组 例:array('sort'=>'desc')
+     * @return $this
+     */
+    public function order($option) {
+        if ($this->_clear>0) $this->_clear();
+        $this->_order = ' order by ';
+        if (is_string($option)) {
+            $this->_order .= $option;
+        }
+        elseif (is_array($option)) {
+            foreach($option as $k=>$v){
+                $order = $this->_addChar($k).' '.$v;
+                $this->_order .= isset($mark) ? ','.$order : $order;
+                $mark = 1;
+            }
+        }
+        return $this;
+    }
+  
+    /**
+     * 设置查询行数及页数
+     * @param int $page pageSize不为空时为页数，否则为行数
+     * @param int $pageSize 为空则函数设定取出行数，不为空则设定取出行数及页数
+     * @return $this
+     */
+    public function limit($page,$pageSize=null) {
+        if ($this->_clear>0) $this->_clear();
+        if ($pageSize===null) {
+            $this->_limit = "limit ".$page;
+        }
+        else {
+            $pageval = intval( ($page - 1) * $pageSize);
+            $this->_limit = "limit ".$pageval.",".$pageSize;
+        }
+        return $this;
+    }
+  
+    /**
+     * 设置查询字段
+     * @param mixed $field 字段数组
+     * @return $this
+     */
+    public function field($field){
+        if ($this->_clear>0) $this->_clear();
+        if (is_string($field)) {
+            $field = explode(',', $field);
+        }
+        $nField = array_map(array($this,'_addChar'), $field);
+        $this->_field = implode(',', $nField);
+        return $this;
+    }
+  
+    /**
+     * 清理标记函数
+     */
+    protected function _clear() {
+        $this->_where = '';
+        $this->_order = '';
+        $this->_limit = '';
+        $this->_field = '*';
+        $this->_clear = 0;
+    }
+  
+    /**
+     * 手动清理标记
+     * @return $this
+     */
+    public function clearKey() {
+        $this->_clear();
+        return $this;
+    }
+ 
+    /**
+    * 启动事务 
+    * @return void 
+    */
+    public function startTrans() { 
+        //数据rollback 支持 
+        if ($this->_trans==0) self::$_dbh->beginTransaction();
+        $this->_trans++; 
+        return; 
+    }
+     
+    /** 
+    * 用于非自动提交状态下面的查询提交 
+    * @return boolen 
+    */
+    public function commit() {
+        $result = true;
+        if ($this->_trans>0) { 
+            $result = self::$_dbh->commit(); 
+            $this->_trans = 0;
+        } 
+        return $result;
+    }
+ 
+    /** 
+    * 事务回滚 
+    * @return boolen 
+    */
+    public function rollback() {
+        $result = true;
+        if ($this->_trans>0) {
+            $result = self::$_dbh->rollback();
+            $this->_trans = 0;
+        }
+        return $result;
+    }
+ 
+    /**
+    * 关闭连接
+    * PHP 在脚本结束时会自动关闭连接。
+    */
+    public function close() {
+        if (!is_null(self::$_dbh)) self::$_dbh = null;
+    }
+ 
 }
 
+
+<?php
+ /* 使用DEMO
+$mysql = new MMysql($configArr);
+ 
+//插入
+$data = array(
+    'sid'=>101,
+    'aa'=>123456,
+    'bbc'=>'aaaaaaaaaaaaaa',
+    );
+$mysql->insert('t_table',$data);
+
+//查询
+$res = $mysql->field(array('sid','aa','bbc'))
+    ->order(array('sid'=>'desc','aa'=>'asc'))
+    ->where(array('sid'=>"101",'aa'=>array('123455','>','or')))
+    ->limit(1,2)
+    ->select('t_table');
+$res = $mysql->field('sid,aa,bbc')
+    ->order('sid desc,aa asc')
+    ->where('sid=101 or aa>123455')
+    ->limit(1,2)
+    ->select('t_table');
+
+//获取最后执行的sql语句
+$sql = $mysql->getLastSql();
+//直接执行sql语句
+$sql = "show tables";
+$res = $mysql->doSql($sql);
+//事务
+
+$mysql->startTrans();
+$mysql->where(array('sid'=>102))->update('t_table',array('aa'=>666666));
+$mysql->where(array('sid'=>103))->update('t_table',array('bbc'=>'呵呵8888呵呵'));
+$mysql->where(array('sid'=>104))->delete('t_table');
+$mysql->commit();
+*/
 ?>

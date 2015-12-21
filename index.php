@@ -11,6 +11,8 @@
 		<?php
 			error_reporting(E_ERROR);
 			$type = empty($_GET['type']) ? '1' : $_GET['type'];
+			$q = empty($_GET['q']) ? '' : $_GET['q'];
+
 			include 'config.php';
 			$limit_num = 50;
 
@@ -27,8 +29,12 @@
 		<select name='cn_type'>
 			<option value='1' url='record_cn_blogs.php' <?php if($type=='1'){echo "selected='selected'";}?>>首页博文</option>
 			<option value='2' url="<?php echo 'record_cn_php_blogs.php?num='.$php_count_num?>" <?php if($type=='2'){echo "selected='selected'";}?> >PHP博文</option>
+			<option value='3' url="<?php echo 'record_douban_book.php?q='.$q;?>" <?php if($type=='3'){echo "selected='selected'";}?> >豆瓣书籍</option>
 		</select>
-		<input type="button" value="手动更新" id="update_btn">
+		<?php if($type==3){?><input type="text" name="q" width='30%' value="<?php echo $q;?>" ><?php }?>
+		
+		<input type="button" value="查询" id="query_btn">
+		<input type="button" value="更新数据" id="update_btn">
 
 		<?php
 		if($type=='1'){
@@ -55,19 +61,35 @@
 				echo "<li>" . $row['id'] . "<a href='$row[content_url]' target='_blank'> " . $row['title'] . "</a>   &nbsp;&nbsp;".$row['recommon_num'].' &nbsp;&nbsp;'.$row['comment_num'].' &nbsp;&nbsp;'.$row['view_num']."</li>";
 			}
 			echo "</ul>";
+		}elseif($type=='3'){
+			//显示查询的豆瓣图书
+			$q_con = empty($q) ? "" : " where title like '%$q%'";
+			$sql = "select count(*) from douban_books". $q_con;
+			$res = mysql_query($sql);
+			$counts_info = mysql_fetch_array($res);
+			$count_num = $counts_info['0'];
+
+			$sql = "select * from douban_books $q_con order by id desc limit $start_num,$limit_num";
+			$res = mysql_query($sql, $con);
+			echo "<ul>";
+			echo "<li>ID&nbsp&nbsp;书名&nbsp;&nbsp;评分&nbsp;&nbsp;作者&nbsp;&nbsp;译者&nbsp;&nbsp;页数&nbsp;&nbsp;出版日期&nbsp;&nbsp;标签";
+			while ($row = mysql_fetch_assoc($res)) {
+				echo "<li>" . $row['id'] . "<a href='$row[url]' target='_blank'> 《" . $row['title'] . "》</a>   &nbsp;&nbsp;".$row['average'].' &nbsp;&nbsp;'.$row['author'].' &nbsp;&nbsp;'.$row['translator'].' &nbsp;&nbsp;'.$row['pages'].' &nbsp;&nbsp;'.$row['pubdate'].'&nbsp;&nbsp;'.$row['tags']."<a href='./db_book_tags_search.php?id=$row[id]' target='_other'> <font color='red'>查看相似</font></a></li>";
+			}
+			echo "</ul>";
 		}
 
 		mysql_free_result($res);
 
-		$page_num = ceil($count_num / $limit_num);
+		$page_num = ceil($count_num/$limit_num);
 		$next_page = $page + 1;
 		$pre_page = $page - 1;
 
-		echo "<a href='?page=1&type=$type'>首页</a>  ";
-		echo "<a href='?page=$pre_page&type=$type'>前页</a>  ";
+		echo "<a href='?page=1&type=$type&q=$q'>首页</a>  ";
+		echo "<a href='?page=$pre_page&type=$type&q=$q'>前页</a>  ";
 		echo "第 $page / $page_num 页  ";
-		echo "<a href='?page=$next_page&type=$type'>下页</a>  ";
-		echo "<a href='?page=$page_num&type=$type'>末页</a>  ";
+		echo "<a href='?page=$next_page&type=$type&q=$q'>下页</a>  ";
+		echo "<a href='?page=$page_num&type=$type&q=$q'>末页</a>  ";
 		?>
 	</body>
 
@@ -87,6 +109,16 @@
 						window.location.reload();
 					}
 				});
+			});
+
+			$('#query_btn').click(function(){
+				var cn_type = <?php echo $type;?>;
+				if(cn_type != 3){
+					window.location.reload();
+				}else{
+					var q = $("input[name='q']").val();
+					window.location.href="./?type=3&q="+q;
+				}
 			});
 
 		});

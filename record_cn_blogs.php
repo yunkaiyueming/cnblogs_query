@@ -3,7 +3,6 @@
 
 //引用相关的类库
 require 'QueryList/QueryList.class.php';
-require 'class_mysql.php';
 require 'config.php';
 
 // 取值类似jQuery的操作
