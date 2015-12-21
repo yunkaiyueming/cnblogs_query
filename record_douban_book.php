@@ -32,10 +32,10 @@ if(!empty($book_json_infos)){
 		$tag_str = substr($tag_str, 0, -2);
 
 		if(empty($num_rows)){
-			$book_arr = array( 
+			$book_arr = array(
 				$book_info['id'],
 				$book_info['title'], 
-				$book_info['url'], 
+				$book_info['alt'], 
 				$tag_str,
 				$book_info['rating']['average'], 
 				$book_info['isbn13'],
