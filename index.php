@@ -30,6 +30,7 @@
 			<option value='1' url='record_cn_blogs.php' <?php if($type=='1'){echo "selected='selected'";}?>>首页博文</option>
 			<option value='2' url="<?php echo 'record_cn_php_blogs.php?num='.$php_count_num?>" <?php if($type=='2'){echo "selected='selected'";}?> >PHP博文</option>
 			<option value='3' url="<?php echo 'record_douban_book.php?q='.$q;?>" <?php if($type=='3'){echo "selected='selected'";}?> >豆瓣书籍</option>
+			<option value='4' url="<?php echo 'youdao_index.php';?>" <?php if($type=='4'){echo "selected='selected'";}?> >有道翻译</option>
 		</select>
 		<?php if($type==3){?><input type="text" name="q" width='30%' value="<?php echo $q;?>" ><?php }?>
 		
@@ -98,7 +99,12 @@
         $(function(){
         	$("select[name='cn_type']").change(function(){
         		var cn_type = $("select[name='cn_type']").val();
-        		window.location.href='./?type='+cn_type;	
+
+        		if(cn_type=='4'){//有道翻译跳转翻译页面
+        			window.location.href='./youdao_index.php';
+        		}else{
+        			window.location.href='./?type='+cn_type;	
+        		}
         	});
 
 			$('#update_btn').click(function(){
