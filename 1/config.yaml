@@ -3,5 +3,8 @@ version: 1
 accesskey: kymzmlom44
 cron:
     - description: cron get cnblogs
-      url: http://ykcnblogs.sinaapp.com/record_cn_blogs.php
-      schedule: */30 * * * *
+      url: /record_cn_blogs.php
+      schedule: */5 * * * *
+    - description: cron get cnblogs_php
+      url: /record_cn_php_blogs.php
+      schedule: */5 * * * *

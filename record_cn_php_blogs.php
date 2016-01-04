@@ -20,18 +20,21 @@ $rang = '.searchItem';
 $con = mysql_connect(DB_HOST.":".DB_PORT, DB_USER, DB_PWD);
 mysql_select_db(DB_NAME);
 
+$sql = "select count(*) from cn_php_blogs";
+$res = mysql_query($sql);
+$counts_info = mysql_fetch_array($res);
+$exist_max_num = $counts_info['0'];
+
 //每5页一跑, 每页20篇
-$exist_max_num = isset($_GET['num']) ? $_GET['num']:1;
 $start_page = ceil($exist_max_num/20);
 $start_num = intval($exist_max_num%20);
-
 if($start_num==19){
 	$start_page++;
 }
 
 for($page=$start_page ; $page<$start_page+5; $page++){
 	$url = 'http://zzk.cnblogs.com/s?w=php';
-	$url = empty($page) ? $url : ($url."&p=".$page);echo $url."<br>";
+	$url = empty($page) ? $url : ($url."&p=".$page);
 	$hj = QueryList::Query($url, $reg, $rang, 'UTF-8');
 	$cn_blogs = $hj->data;
 

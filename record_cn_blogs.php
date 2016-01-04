@@ -40,7 +40,7 @@ for($page=4; $page>0; $page--){
 			$values = implode("','", $cn_blog);			
 			$sql = "insert into cn_blogs(img_url,title, content, content_url) values('$values')";
 			mysql_query($sql);
-			echo 'success';
+			echo 'success'."<br>";
 		}
 	}
 }
