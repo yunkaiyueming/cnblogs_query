@@ -45,3 +45,10 @@ CREATE TABLE IF NOT EXISTS `douban_books` (
     KEY `tags_key` (`tags`),
     KEY `author_key` (`author`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `cn_thinkphp_tuijian`(
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`title` varchar(100) NOT NULL  COMMENT '推荐内容的标题',
+`title_url` varchar(100) NOT NULL COMMENT '推荐内容的URL',
+ PRIMARY KEY (`id`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;

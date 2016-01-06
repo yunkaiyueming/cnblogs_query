@@ -31,6 +31,7 @@
 			<option value='2' url="<?php echo 'record_cn_php_blogs.php'?>" <?php if($type=='2'){echo "selected='selected'";}?> >PHP博文</option>
 			<option value='3' url="<?php echo 'record_douban_book.php?q='.$q;?>" <?php if($type=='3'){echo "selected='selected'";}?> >豆瓣书籍</option>
 			<option value='4' url="<?php echo 'youdao_index.php';?>" <?php if($type=='4'){echo "selected='selected'";}?> >有道翻译</option>
+			<option value='5' url="<?php echo 'record_cn_thinkphp.php';?>" <?php if($type=='5'){echo "selected='selected'";}?> >ThinkPhp</option>
 		</select>
 		<?php if($type==3){?><input type="text" name="q" width='30%' value="<?php echo $q;?>" ><?php }?>
 		
@@ -76,6 +77,18 @@
 			echo "<li>ID&nbsp&nbsp;书名&nbsp;&nbsp;评分&nbsp;&nbsp;作者&nbsp;&nbsp;译者&nbsp;&nbsp;页数&nbsp;&nbsp;出版日期&nbsp;&nbsp;标签";
 			while ($row = mysql_fetch_assoc($res)) {
 				echo "<li>" . $row['id'] . "<a href='$row[url]' target='_blank'> 《" . $row['title'] . "》</a>   &nbsp;&nbsp;".$row['average'].' &nbsp;&nbsp;'.$row['author'].' &nbsp;&nbsp;'.$row['translator'].' &nbsp;&nbsp;'.$row['pages'].' &nbsp;&nbsp;'.$row['pubdate'].'&nbsp;&nbsp;'.$row['tags']."<a href='./db_book_tags_search.php?id=$row[id]' target='_other'> <font color='red'>查看相似</font></a></li>";
+			}
+			echo "</ul>";
+		}elseif($type=='5'){
+			//显示查询的thinkphp的博文
+			$res = mysql_query("select count(*) from cn_thinkphp_tuijian order by id desc");
+			$counts_info = mysql_fetch_array($res);
+			$count_num = $counts_info['0'];
+			$sql = "select * from cn_thinkphp_tuijian order by id desc limit $start_num,$limit_num";
+			$res = mysql_query($sql, $con);
+			echo "<ul>";
+			while ($row = mysql_fetch_assoc($res)) {
+				echo "<li>" . $row['id'] . "<a href='$row[title_url]' target='_blank'> " . $row['title'] . "</a></li>";
 			}
 			echo "</ul>";
 		}
