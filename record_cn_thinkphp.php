@@ -20,7 +20,7 @@ $rang = ".article-title";
 foreach($fetch_url_types as $url_type){
 	$real_fetch_url = $base_url."/".$url_type;
 	//每类抓取2页
-	for($i=1; $i<3;$i++){
+	for($i=1; $i<6;$i++){
 		$url = $real_fetch_url."/p/".$i.".html";
 		$hj = QueryList::Query($url, $reg, $rang, 'UTF-8');
 		$cn_thinkphp_infos = $hj->data;

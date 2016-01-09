@@ -33,18 +33,19 @@
 			<option value='4' url="<?php echo 'youdao_index.php';?>" <?php if($type=='4'){echo "selected='selected'";}?> >有道翻译</option>
 			<option value='5' url="<?php echo 'record_cn_thinkphp.php';?>" <?php if($type=='5'){echo "selected='selected'";}?> >ThinkPhp</option>
 		</select>
-		<?php if($type==3){?><input type="text" name="q" width='30%' value="<?php echo $q;?>" ><?php }?>
-		
+		<input type="text" name="q" width='30%' value="<?php echo $q;?>" >
 		<input type="button" value="查询" id="query_btn">
 		<input type="button" value="更新数据" id="update_btn">
 
 		<?php
+		$q_con = empty($q) ? "" : " where title like '%$q%'";
+
 		if($type=='1'){
 			//显示cn_blogs主页博文
-			$res = mysql_query("select count(*) from cn_blogs");
+			$res = mysql_query("select count(*) from cn_blogs $q_con");
 			$counts_info = mysql_fetch_array($res);
 			$count_num = $counts_info['0'];
-			$sql = "select * from cn_blogs order by id desc limit $start_num,$limit_num";
+			$sql = "select * from cn_blogs $q_con order by id desc limit $start_num,$limit_num";
 			$res = mysql_query($sql, $con);
 			echo "<ul>";
 			while ($row = mysql_fetch_assoc($res)) {
@@ -53,10 +54,10 @@
 			echo "</ul>";
 		}elseif($type=='2'){
 			//显示查询的php的博文
-			$res = mysql_query("select count(*) from cn_php_blogs");
+			$res = mysql_query("select count(*) from cn_php_blogs $q_con");
 			$counts_info = mysql_fetch_array($res);
 			$count_num = $counts_info['0'];
-			$sql = "select * from cn_php_blogs order by id desc limit $start_num,$limit_num";
+			$sql = "select * from cn_php_blogs $q_con order by id desc limit $start_num,$limit_num";
 			$res = mysql_query($sql, $con);
 			echo "<ul>";
 			while ($row = mysql_fetch_assoc($res)) {
@@ -81,10 +82,10 @@
 			echo "</ul>";
 		}elseif($type=='5'){
 			//显示查询的thinkphp的博文
-			$res = mysql_query("select count(*) from cn_thinkphp_tuijian order by id desc");
+			$res = mysql_query("select count(*) from cn_thinkphp_tuijian $q_con order by id desc");
 			$counts_info = mysql_fetch_array($res);
 			$count_num = $counts_info['0'];
-			$sql = "select * from cn_thinkphp_tuijian order by id desc limit $start_num,$limit_num";
+			$sql = "select * from cn_thinkphp_tuijian $q_con order by id desc limit $start_num,$limit_num";
 			$res = mysql_query($sql, $con);
 			echo "<ul>";
 			while ($row = mysql_fetch_assoc($res)) {
@@ -132,12 +133,8 @@
 
 			$('#query_btn').click(function(){
 				var cn_type = <?php echo $type;?>;
-				if(cn_type != 3){
-					window.location.reload();
-				}else{
-					var q = $("input[name='q']").val();
-					window.location.href="./?type=3&q="+q;
-				}
+				var q = $("input[name='q']").val();
+				window.location.href="./?type="+cn_type+"&q="+q;
 			});
 
 		});
