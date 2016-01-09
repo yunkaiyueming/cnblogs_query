@@ -57,7 +57,7 @@ function get_all_url(){
 	//从数据库中查处所有已经有的数据，进行对比，如果有，则不插入
 	$mysql_str = "SELECT cn_thinkphp_tuijian.title_url from cn_thinkphp_tuijian ORDER BY id ;";
 	$res_datas = getAll($mysql_str);
-	$arr_exit = [];
+	$arr_exit = array();
 	foreach ($res_datas as $res_data) {
 		$arr_exit[] = $res_data[0];
 	}
