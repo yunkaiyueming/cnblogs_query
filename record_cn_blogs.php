@@ -20,7 +20,6 @@ $rang = '.post_item';
 $con = mysql_connect(DB_HOST.":".DB_PORT, DB_USER, DB_PWD);
 mysql_select_db(DB_NAME);
 for($page=4; $page>0; $page--){
-	echo 'page:'.$page."<br>";
 	$url = 'http://www.cnblogs.com';
 	$url = empty($page) ? $url : ($url."/p".$page);
 	$hj = QueryList::Query($url, $reg, $rang, 'UTF-8');
@@ -30,7 +29,6 @@ for($page=4; $page>0; $page--){
 	$get_cnblogs_nums = count($cn_blogs)-1;
 	
 	for($i=$get_cnblogs_nums; $i>=0; $i--){
-		echo $i." ";
 		$cn_blog = $cn_blogs[$i];
 		
 		$exist_sql = "select id from cn_blogs where content_url='".$cn_blog['content_url']."'";
