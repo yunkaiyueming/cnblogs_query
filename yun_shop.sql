@@ -4,21 +4,21 @@ SET time_zone = "+00:00";
 CREATE DATABASE IF NOT EXISTS `yun_shop` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `yun_shop`;
 
-CREATE TABLE IF NOT EXISTS `item` (
+CREATE TABLE IF NOT EXISTS `goods` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
-    `item_name` varchar(300) NOT NULL COMMENT '商品名称',  
-    `item_price` float(20) DEFAULT 0 COMMENT '商品价格',
-    `class_id` int(11) NOT NULL COMMENT '商品分类ID',
+    `goods_name` varchar(300) NOT NULL COMMENT '商品名称',  
+    `goods_price` float(20) DEFAULT 0 COMMENT '商品价格',
+    `type_id` int(11) NOT NULL COMMENT '商品分类ID',
     'label_ids' varchar(20) COMMENT '商品标签',
-    'item_order' int(11) DEFAULT 0 COMMENT '商品排序字段'
+    'goods_order' int(11) DEFAULT 0 COMMENT '商品排序字段'
     PRIMARY KEY (`id`),
-    KEY `item_order` (`orders`)
+    KEY `goods_order` (`orders`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `item_class`(
+CREATE TABLE IF NOT EXISTS `goods_type`(
 `id` int(11) NOT NULL AUTO_INCREMENT,
-`class_name` varchar(15) NOT NULL  COMMENT '商品分类名称',
-`class_des` varchar(100) NOT NULL COMMENT '商品分类描述',
+`type_name` varchar(15) NOT NULL  COMMENT '商品分类名称',
+`type_des` varchar(100) NOT NULL COMMENT '商品分类描述',
 `fid` int(11) NOT NULL
  PRIMARY KEY (`id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -46,9 +46,9 @@ CREATE TABLE IF NOT EXISTS `address` (
 
 CREATE TABLE IF NOT EXISTS `shop_car`(
 `id` int(11) NOT NULL AUTO_INCREMENT,
-`item_id` int(11) NOT NULL  COMMENT '商品ID',
+`goods_id` int(11) NOT NULL  COMMENT '商品ID',
 `user_id` int(11) NOT NULL  COMMENT '用户ID'
-`item_num` int(11) Not null DEFAULT 1
+`goods_num` int(11) Not null DEFAULT 1
  PRIMARY KEY (`id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -70,8 +70,8 @@ CREATE TABLE IF NOT EXISTS `orders`(
 CREATE TABLE IF NOT EXISTS `orders_detal`(
 `id` int(11) NOT NULL AUTO_INCREMENT,
 `orders_id` int(11) NOT NULL,
-`item_id`  int(11) NOT NULL,
-`item_num` int(11) NOT NULL  COMMENT '商品数量',
+`goods_id`  int(11) NOT NULL,
+`goods_num` int(11) NOT NULL  COMMENT '商品数量',
  PRIMARY KEY (`id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
