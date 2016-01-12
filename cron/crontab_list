@@ -1,0 +1,25 @@
+#分 时 日 月 周 command
+*/2 * * * * /root/my_cron_sh/test.sh
+*/2 * * * * /root/my_cron_sh/cn_blog.sh
+*/1 * * * * /root/my_cron_sh/cn_php_blog.sh
+*/1 * * * * /root/my_cron_sh/cn_thinphp_blog.sh
+
+
+test.sh
+#!/bin/bash
+date >> date.log
+
+cn_blog.sh
+#!/bin/bash
+date >> cnblog.log
+/usr/bin/curl http://ykcnblogs.sinaapp.com/record_cn_blogs.php >> /root/my_cron_sh/cnblog.log 
+
+cn_php_blog.sh
+#!/bin/bash
+date >> cnblog.log
+/usr/bin/curl http://ykcnblogs.sinaapp.com/record_cn_php_blogs.php >> /root/my_cron_sh/cnblog.log
+
+//cn_thinphp_blog.sh
+#!/bin/bash
+date >> cnblog.log
+/usr/bin/curl http://ykcnblogs.sinaapp.com/record_cn_thinkphp.php >> /root/my_cron_sh/cnblog.log
