@@ -37,7 +37,7 @@ for($page=$start_page ; $page<$start_page+5; $page++){
 	$url = empty($page) ? $url : ($url."&p=".$page);
 	$hj = QueryList::Query($url, $reg, $rang, 'UTF-8');
 	$cn_blogs = $hj->data;
-	print_r($cn_blogs);continue;
+	print_r($cn_blogs);
 
 	foreach($cn_blogs as $cn_blog) {
 		$exist_sql = "select id from cn_php_blogs where content_url='".$cn_blog['content_url']."'";
