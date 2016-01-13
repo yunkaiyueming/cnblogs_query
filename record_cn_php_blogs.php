@@ -38,15 +38,19 @@ for($page=$start_page ; $page<$start_page+5; $page++){
 	$hj = QueryList::Query($url, $reg, $rang, 'UTF-8');
 	$cn_blogs = $hj->data;
 
+	echo count($cn_blogs)."<br>";
 	foreach($cn_blogs as $cn_blog) {
 		$exist_sql = "select id from cn_php_blogs where content_url='".$cn_blog['content_url']."'";
 
 		$exist_res = mysql_query($exist_sql);
 		$num_rows = mysql_num_rows($exist_res);
+		var_dump($num_rows);
 		if(empty($num_rows)){
 			$values = implode("','", $cn_blog);			
 			$sql = "insert into cn_php_blogs(title, content_url, recommon_num, comment_num, view_num) values('$values')";
 			mysql_query($sql);
+
+			echo $sql;
 			echo 'success';
 		}
 	}
