@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS `cn_php_blogs` (
     `recommon_num` varchar(15) DEFAULT '0',
     `comment_num` varchar(15) DEFAULT '0',
     `view_num` varchar(15) DEFAULT '0',
+    `view_type` int(4),
     PRIMARY KEY (`id`),
     KEY `tittle_key` (`title`),
     KEY `recommon_num_key` (`recommon_num`),

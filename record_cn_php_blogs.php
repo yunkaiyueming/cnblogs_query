@@ -20,10 +20,10 @@ $rang = '.searchItem';
 $con = mysql_connect(DB_HOST.":".DB_PORT, DB_USER, DB_PWD);
 mysql_select_db(DB_NAME);
 
-$sql = "select count(*) from cn_php_blogs";
+$sql = "select count(*) from cn_php_blogs where view_type='1000'";
 $res = mysql_query($sql);
 $counts_info = mysql_fetch_array($res);
-$exist_max_num = $counts_info['0'];
+$exist_max_num = $counts_info['0']=2002;
 
 //每5页一跑, 每页20篇
 $start_page = ceil($exist_max_num/20);
@@ -33,7 +33,7 @@ if($start_num==19){
 }
 
 for($page=$start_page ; $page<$start_page+5; $page++){
-	$url = 'http://zzk.cnblogs.com/s?w=php';
+	$url = 'http://zzk.cnblogs.com/s?w=php&views=1000';
 	$url = empty($page) ? $url : ($url."&p=".$page);
 	$hj = QueryList::Query($url, $reg, $rang, 'UTF-8');
 	$cn_blogs = $hj->data;
@@ -46,8 +46,9 @@ for($page=$start_page ; $page<$start_page+5; $page++){
 		$num_rows = mysql_num_rows($exist_res);
 		var_dump($num_rows);
 		if(empty($num_rows)){
+			$cn_blog['view_type'] = '1000';
 			$values = implode("','", $cn_blog);			
-			$sql = "insert into cn_php_blogs(title, content_url, recommon_num, comment_num, view_num) values('$values')";
+			$sql = "insert into cn_php_blogs(title, content_url, recommon_num, comment_num, view_num, view_type) values('$values')";
 			mysql_query($sql);
 
 			echo $sql;
