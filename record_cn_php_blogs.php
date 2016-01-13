@@ -23,7 +23,7 @@ mysql_select_db(DB_NAME);
 $sql = "select count(*) from cn_php_blogs where view_type='1000'";
 $res = mysql_query($sql);
 $counts_info = mysql_fetch_array($res);
-$exist_max_num = $counts_info['0']=2002;
+$exist_max_num = $counts_info['0'];
 
 //每5页一跑, 每页20篇
 $start_page = ceil($exist_max_num/20);
@@ -38,7 +38,6 @@ for($page=$start_page ; $page<$start_page+5; $page++){
 	$hj = QueryList::Query($url, $reg, $rang, 'UTF-8');
 	$cn_blogs = $hj->data;
 
-	echo count($cn_blogs)."<br>";
 	foreach($cn_blogs as $cn_blog) {
 		$exist_sql = "select id from cn_php_blogs where content_url='".$cn_blog['content_url']."'";
 
@@ -51,7 +50,6 @@ for($page=$start_page ; $page<$start_page+5; $page++){
 			$sql = "insert into cn_php_blogs(title, content_url, recommon_num, comment_num, view_num, view_type) values('$values')";
 			mysql_query($sql);
 
-			echo $sql;
 			echo 'success';
 		}
 	}
