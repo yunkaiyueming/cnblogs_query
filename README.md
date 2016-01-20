@@ -1,2 +1,2 @@
-# cnblogs_query
+# cnblogs_query #
 query cnblogs
