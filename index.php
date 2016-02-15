@@ -12,7 +12,7 @@
     	<a href="https://github.com/yunkaiyueming"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 	</div>
 		<?php
-			error_reporting(E_ERROR);
+			//error_reporting(E_ERROR);
 			$type = empty($_GET['type']) ? '1' : $_GET['type'];
 			$q = empty($_GET['q']) ? '' : $_GET['q'];
 
@@ -31,10 +31,11 @@
 		?>
 		<select name='cn_type'>
 			<option value='1' url='record_cn_blogs.php' <?php if($type=='1'){echo "selected='selected'";}?>>首页博文</option>
-			<option value='2' url="<?php echo 'record_cn_php_blogs.php'?>" <?php if($type=='2'){echo "selected='selected'";}?> >PHP博文</option>
+			<option value='6' url='record_cn_kb.php' <?php if($type=='6'){echo "selected='selected'";}?>>知识博文</option>
+			<option value='2' url='record_cn_php_blogs.php' <?php if($type=='2'){echo "selected='selected'";}?> >PHP博文</option>
 			<option value='3' url="<?php echo 'record_douban_book.php?q='.$q;?>" <?php if($type=='3'){echo "selected='selected'";}?> >豆瓣书籍</option>
-			<option value='4' url="<?php echo 'youdao_index.php';?>" <?php if($type=='4'){echo "selected='selected'";}?> >有道翻译</option>
-			<option value='5' url="<?php echo 'record_cn_thinkphp.php';?>" <?php if($type=='5'){echo "selected='selected'";}?> >ThinkPhp</option>
+			<option value='4' url='youdao_index.php' <?php if($type=='4'){echo "selected='selected'";}?> >有道翻译</option>
+			<option value='5' url='record_cn_thinkphp.php' <?php if($type=='5'){echo "selected='selected'";}?> >ThinkPhp</option>
 		</select>
 		<input type="text" name="q" width='30%' value="<?php echo $q;?>" >
 		<input type="button" value="查询" id="query_btn">
@@ -93,6 +94,18 @@
 			echo "<ul>";
 			while ($row = mysql_fetch_assoc($res)) {
 				echo "<li>" . $row['id'] . "<a href='$row[title_url]' target='_blank'> " . $row['title'] . "</a></li>";
+			}
+			echo "</ul>";
+		}elseif($type=='6'){
+			//显示查询的cnblog知识的博文
+			$res = mysql_query("select count(*) from cn_kb_blogs $q_con order by id desc");
+			$counts_info = mysql_fetch_array($res);
+			$count_num = $counts_info['0'];
+			$sql = "select * from cn_kb_blogs $q_con order by id desc limit $start_num,$limit_num";
+			$res = mysql_query($sql, $con);
+			echo "<ul>";
+			while ($row = mysql_fetch_assoc($res)) {
+				echo "<li>" . $row['id'] . "<a href='$row[title]' target='_blank'> " . $row['title'] . "</a>&nbsp;&nbsp;".$row['kb_type']."</li>";
 			}
 			echo "</ul>";
 		}

@@ -53,3 +53,13 @@ CREATE TABLE IF NOT EXISTS `cn_thinkphp_tuijian`(
 `title_url` varchar(100) NOT NULL COMMENT '推荐内容的URL',
  PRIMARY KEY (`id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `cn_kb_blogs` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `title` varchar(300) NOT NULL,
+    `content` varchar(500) DEFAULT '',
+    `content_url` varchar(500) DEFAULT '',
+    `kb_type` varchar(30) DEFAULT '',
+    PRIMARY KEY (`id`),
+    KEY `tittle_key` (`title`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
