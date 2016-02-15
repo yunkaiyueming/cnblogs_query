@@ -32,7 +32,8 @@ if($start_num==19){
 
 for($page=4; $page>0; $page--){
 	$url = 'http://home.cnblogs.com/kb';
-	$url = empty($page) ? $url : ($url."/page/".$page);
+	$fetch_page = $start_page+$page;
+	$url = empty($page) ? $url : ($url."/page/".$fetch_page);
 	$hj = QueryList::Query($url, $reg, $rang, 'UTF-8');
 	$cn_blogs = $hj->data;
 
