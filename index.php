@@ -24,10 +24,6 @@
 
 			$con = mysql_connect(DB_HOST . ":" . DB_PORT, DB_USER, DB_PWD);
 			mysql_select_db(DB_NAME);
-
-			$res = mysql_query("select count(*) from cn_php_blogs");
-			$counts_info = mysql_fetch_array($res);
-			$php_count_num = $counts_info['0'];
 		?>
 		<select name='cn_type'>
 			<option value='1' url='record_cn_blogs.php' <?php if($type=='1'){echo "selected='selected'";}?>>首页博文</option>
@@ -43,73 +39,50 @@
 
 		<?php
 		$q_con = empty($q) ? "" : " where title like '%$q%'";
+		$query_arrs = array(
+			'1'=>array('table_name'=>'cn_blogs', 'row'=>array('url'=>'content_url')),
+			'2'=>array('table_name'=>'cn_php_blogs', 'row'=>array('url'=>'content_url', 'recommon_num','comment_num', 'view_num')),
+			'3'=>array('table_name'=>'douban_books', 'row'=>array('url'=>'content_url', 'average', 'translator', 'pages','pubdate','')),
+			'5'=>array('table_name'=>'cn_thinkphp_tuijian', 'row'=>array('url'=>'title_url')),
+			'6'=>array('table_name'=>'cn_kb_blogs', 'row'=>array('url'=>'content_url', 'kb_type')),
+		);
 
+		$query_infos = $query_arrs[$type];
+		$sql = "select * from $query_infos[table_name] $q_con order by id desc limit $start_num,$limit_num";
+		$res = mysql_query($sql, $con);
+		echo "<ul>";
 		if($type=='1'){
 			//显示cn_blogs主页博文
-			$res = mysql_query("select count(*) from cn_blogs $q_con");
-			$counts_info = mysql_fetch_array($res);
-			$count_num = $counts_info['0'];
-			$sql = "select * from cn_blogs $q_con order by id desc limit $start_num,$limit_num";
-			$res = mysql_query($sql, $con);
-			echo "<ul>";
 			while ($row = mysql_fetch_assoc($res)) {
 				echo "<li>" . $row['id'] . "<a href='$row[content_url]' target='_blank'> " . $row['title'] . "</a></li>";
 			}
-			echo "</ul>";
 		}elseif($type=='2'){
 			//显示查询的php的博文
-			$res = mysql_query("select count(*) from cn_php_blogs $q_con");
-			$counts_info = mysql_fetch_array($res);
-			$count_num = $counts_info['0'];
-			$sql = "select * from cn_php_blogs $q_con order by id desc limit $start_num,$limit_num";
-			$res = mysql_query($sql, $con);
-			echo "<ul>";
 			while ($row = mysql_fetch_assoc($res)) {
 				echo "<li>" . $row['id'] . "<a href='$row[content_url]' target='_blank'> " . $row['title'] . "</a>   &nbsp;&nbsp;".$row['recommon_num'].' &nbsp;&nbsp;'.$row['comment_num'].' &nbsp;&nbsp;'.$row['view_num']."</li>";
 			}
-			echo "</ul>";
 		}elseif($type=='3'){
 			//显示查询的豆瓣图书
-			$q_con = empty($q) ? "" : " where title like '%$q%'";
-			$sql = "select count(*) from douban_books". $q_con;
-			$res = mysql_query($sql);
-			$counts_info = mysql_fetch_array($res);
-			$count_num = $counts_info['0'];
-
-			$sql = "select * from douban_books $q_con order by id desc limit $start_num,$limit_num";
-			$res = mysql_query($sql, $con);
-			echo "<ul>";
 			echo "<li>ID&nbsp&nbsp;书名&nbsp;&nbsp;评分&nbsp;&nbsp;作者&nbsp;&nbsp;译者&nbsp;&nbsp;页数&nbsp;&nbsp;出版日期&nbsp;&nbsp;标签";
 			while ($row = mysql_fetch_assoc($res)) {
 				echo "<li>" . $row['id'] . "<a href='$row[url]' target='_blank'> 《" . $row['title'] . "》</a>   &nbsp;&nbsp;".$row['average'].' &nbsp;&nbsp;'.$row['author'].' &nbsp;&nbsp;'.$row['translator'].' &nbsp;&nbsp;'.$row['pages'].' &nbsp;&nbsp;'.$row['pubdate'].'&nbsp;&nbsp;'.$row['tags']."<a href='./db_book_tags_search.php?id=$row[id]' target='_other'> <font color='red'>查看相似</font></a></li>";
 			}
-			echo "</ul>";
 		}elseif($type=='5'){
 			//显示查询的thinkphp的博文
-			$res = mysql_query("select count(*) from cn_thinkphp_tuijian $q_con order by id desc");
-			$counts_info = mysql_fetch_array($res);
-			$count_num = $counts_info['0'];
-			$sql = "select * from cn_thinkphp_tuijian $q_con order by id desc limit $start_num,$limit_num";
-			$res = mysql_query($sql, $con);
-			echo "<ul>";
 			while ($row = mysql_fetch_assoc($res)) {
 				echo "<li>" . $row['id'] . "<a href='$row[title_url]' target='_blank'> " . $row['title'] . "</a></li>";
 			}
-			echo "</ul>";
 		}elseif($type=='6'){
 			//显示查询的cnblog知识的博文
-			$res = mysql_query("select count(*) from cn_kb_blogs $q_con order by id desc");
-			$counts_info = mysql_fetch_array($res);
-			$count_num = $counts_info['0'];
-			$sql = "select * from cn_kb_blogs $q_con order by id desc limit $start_num,$limit_num";
-			$res = mysql_query($sql, $con);
-			echo "<ul>";
 			while ($row = mysql_fetch_assoc($res)) {
-				echo "<li>" . $row['id'] . "<a href='$row[title]' target='_blank'> " . $row['title'] . "</a>&nbsp;&nbsp;".$row['kb_type']."</li>";
+				echo "<li>" . $row['id'] . "<a href='$row[content_url]' target='_blank'> " . $row['title'] . "</a>&nbsp;&nbsp;".$row['kb_type']."</li>";
 			}
-			echo "</ul>";
 		}
+		echo "</ul>";
 
+		$res = mysql_query("select count(*) from $query_infos[table_name] $q_con");
+		$counts_info = mysql_fetch_array($res);
+		$count_num = $counts_info['0'];
 		mysql_free_result($res);
 
 		$page_num = ceil($count_num/$limit_num);
